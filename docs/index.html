@@ -27,9 +27,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .preview-grid img { width: 100%; border-radius: 10px; border: 1px solid #334155; transition: transform 0.2s; }
 .preview-grid img:hover { transform: scale(1.02); }
 @media (max-width: 600px) { .preview-grid { grid-template-columns: 1fr; } }
-.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; }
 .lightbox.show { display: flex; }
-.lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 60px rgba(0,0,0,0.5); }
+.lightbox img { max-width: 85vw; max-height: 85vh; border-radius: 8px; box-shadow: 0 8px 60px rgba(0,0,0,0.5); pointer-events: none; }
+.lightbox-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.1); color: #fff; border: none; width: 48px; height: 48px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; transition: background 0.2s; z-index: 1; }
+.lightbox-btn:hover { background: rgba(255,255,255,0.25); }
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
 .platforms { text-align: center; padding: 40px 20px; background: #1e293b; }
 .platforms h2 { margin-bottom: 20px; }
 .platform-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
@@ -78,22 +82,47 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <p style="margin-top: 16px; color: #94a3b8; font-size: 0.85rem;">基于 Tauri v2 + CodeMirror 6 构建</p>
 </div>
 
-<div class="lightbox" id="lightbox"><img id="lightboxImg" src="" alt="放大预览"></div>
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-btn lightbox-prev" id="lbPrev">‹</button>
+  <img id="lightboxImg" src="" alt="放大预览">
+  <button class="lightbox-btn lightbox-next" id="lbNext">›</button>
+</div>
 
 <div class="footer">
   <p>MD Live Viewer · 开源 · MIT License</p>
 </div>
 
 <script>
-document.querySelectorAll('.preview-grid img').forEach(img => {
-  img.addEventListener('click', () => {
-    document.getElementById('lightboxImg').src = img.src;
-    document.getElementById('lightbox').classList.add('show');
-  });
+const imgs = Array.from(document.querySelectorAll('.preview-grid img'));
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lightboxImg');
+const lbPrev = document.getElementById('lbPrev');
+const lbNext = document.getElementById('lbNext');
+let currentIdx = 0;
+let hideTimer = null;
+
+function showImg(idx) {
+  currentIdx = (idx + imgs.length) % imgs.length;
+  lbImg.src = imgs[currentIdx].src;
+  lb.classList.add('show');
+  clearTimeout(hideTimer);
+}
+
+function hideLb() {
+  lb.classList.remove('show');
+}
+
+imgs.forEach((img, i) => {
+  img.addEventListener('mouseenter', () => showImg(i));
 });
-document.getElementById('lightbox').addEventListener('click', () => {
-  document.getElementById('lightbox').classList.remove('show');
+
+lb.addEventListener('mouseleave', () => {
+  hideTimer = setTimeout(hideLb, 300);
 });
+lb.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+lb.addEventListener('click', (e) => { if (e.target === lb) hideLb(); });
+lbPrev.addEventListener('click', (e) => { e.stopPropagation(); showImg(currentIdx - 1); });
+lbNext.addEventListener('click', (e) => { e.stopPropagation(); showImg(currentIdx + 1); });
 </script>
 </body>
 </html>
