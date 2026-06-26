@@ -67,11 +67,6 @@ md-previewer/
 └── package.json          # 前端依赖
 ```
 
-### ⚠️ 注意事项
-
-- **Windows 中文输入法**：WebView2 Runtime 149 版本存在 IME 焦点 Bug，如遇到中文输入异常，按 `Ctrl+Shift+I` 打开 DevTools 后点击编辑器即可修复
-- **macOS 构建**：需在 Mac 电脑上执行 `npm run tauri build`
-
 ### 📝 依赖
 
 | 包名 | 用途 |
@@ -141,11 +136,6 @@ md-previewer/
 ├── index.html            # Entry HTML
 └── package.json          # Frontend deps
 ```
-
-### ⚠️ Notes
-
-- **Windows IME Issue**: WebView2 Runtime 149 has a known IME focus bug. Press `Ctrl+Shift+I` to open DevTools, then click the editor to fix Chinese input
-- **macOS Build**: Run `npm run tauri build` on a Mac
 
 ### 📝 Dependencies
 
