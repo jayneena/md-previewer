@@ -114,12 +114,13 @@ function hideLb() {
 
 imgs.forEach((img, i) => {
   img.addEventListener('mouseenter', () => showImg(i));
+  img.addEventListener('mouseleave', () => {
+    hideTimer = setTimeout(hideLb, 400);
+  });
 });
 
-lb.addEventListener('mouseleave', () => {
-  hideTimer = setTimeout(hideLb, 300);
-});
 lb.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+lb.addEventListener('mouseleave', () => { hideTimer = setTimeout(hideLb, 400); });
 lb.addEventListener('click', (e) => { if (e.target === lb) hideLb(); });
 lbPrev.addEventListener('click', (e) => { e.stopPropagation(); showImg(currentIdx - 1); });
 lbNext.addEventListener('click', (e) => { e.stopPropagation(); showImg(currentIdx + 1); });
