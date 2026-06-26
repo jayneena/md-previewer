@@ -25,3 +25,6 @@ dist-ssr
 
 # Rust build output
 src-tauri/target/
+
+# opencode skills
+.opencode/
