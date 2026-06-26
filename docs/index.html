@@ -23,10 +23,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .feature .icon { font-size: 1.8rem; margin-bottom: 10px; }
 .feature h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
 .feature p { font-size: 0.85rem; color: #94a3b8; }
-.preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
+.preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; cursor: pointer; }
 .preview-grid img { width: 100%; border-radius: 10px; border: 1px solid #334155; transition: transform 0.2s; }
 .preview-grid img:hover { transform: scale(1.02); }
 @media (max-width: 600px) { .preview-grid { grid-template-columns: 1fr; } }
+.lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; cursor: zoom-out; }
+.lightbox.show { display: flex; }
+.lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 8px 60px rgba(0,0,0,0.5); }
 .platforms { text-align: center; padding: 40px 20px; background: #1e293b; }
 .platforms h2 { margin-bottom: 20px; }
 .platform-badges { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
@@ -75,8 +78,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <p style="margin-top: 16px; color: #94a3b8; font-size: 0.85rem;">基于 Tauri v2 + CodeMirror 6 构建</p>
 </div>
 
+<div class="lightbox" id="lightbox"><img id="lightboxImg" src="" alt="放大预览"></div>
+
 <div class="footer">
   <p>MD Live Viewer · 开源 · MIT License</p>
 </div>
+
+<script>
+document.querySelectorAll('.preview-grid img').forEach(img => {
+  img.addEventListener('click', () => {
+    document.getElementById('lightboxImg').src = img.src;
+    document.getElementById('lightbox').classList.add('show');
+  });
+});
+document.getElementById('lightbox').addEventListener('click', () => {
+  document.getElementById('lightbox').classList.remove('show');
+});
+</script>
 </body>
 </html>
