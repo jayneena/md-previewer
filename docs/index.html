@@ -18,8 +18,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dl-tile-name { font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
 .dl-tile-link { display: inline-block; background: #3b82f6; color: #fff; padding: 10px 28px; border-radius: 8px; font-size: 1rem; text-decoration: none; font-weight: 600; }
 .dl-tile-link:hover { background: #2563eb; }
-.dl-spinner { width: 28px; height: 28px; border: 3px solid #334155; border-top-color: #60a5fa; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto; }
-@keyframes spin { to { transform: rotate(360deg); } }
+
 
 .github-link { display: inline-block; margin-left: 12px; color: #94a3b8; padding: 12px 24px; border-radius: 8px; font-size: 1rem; text-decoration: none; border: 1px solid #334155; transition: border-color 0.2s; }
 .github-link:hover { border-color: #60a5fa; color: #e2e8f0; }
@@ -45,9 +44,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div class="hero">
   <h1>MD Live Viewer</h1>
   <p>跨平台 Markdown 桌面编辑器 — 支持实时预览、代码编辑、Mermaid 图表、DOCX 模版导出。专为重度阅读、轻量编辑及规范文档输出的用户设计。</p>
-  <div class="dl-tiles" id="dlTiles">
-    <div class="dl-tile" style="grid-column:1/-1;background:transparent;border-color:transparent"><div class="dl-spinner"></div></div>
-  </div>
+  <div class="dl-tiles" id="dlTiles"></div>
   <a class="github-link" href="https://github.com/jayneena/md-previewer/releases" target="_blank">查看所有版本 →</a>
 </div>
 
@@ -103,7 +100,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       el.innerHTML += '<div class="dl-tile"><div class="dl-tile-icon">' + t.icon + '</div><div class="dl-tile-name">' + t.label + '</div><a class="dl-tile-link" href="' + url + '">下载 ' + t.ext + '</a></div>';
     });
   }
-  fetch('https://api.github.com/repos/jayneena/md-previewer/releases/latest').then(r => r.json()).then(r => { if (r.assets) render(r.assets); }).catch(() => render());
+  // 先显示默认版本
+  render();
+  // 后台请求最新版本，成功则更新
+  fetch('https://api.github.com/repos/jayneena/md-previewer/releases/latest').then(r => r.json()).then(r => { if (r.assets) render(r.assets); }).catch(() => {});
 })();
 </script>
 </body>
