@@ -23,15 +23,17 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Sync version from tag
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}".TrimStart("v")
-          (Get-Content src-tauri/tauri.conf.json) -replace '"version": ".*"', '"version": "' + $tag + '"' | Set-Content src-tauri/tauri.conf.json
+        run: node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json','utf8'));j.version='${{ github.ref_name }}'.replace(/^v/,'');fs.writeFileSync('src-tauri/tauri.conf.json',JSON.stringify(j,null,2)+'\n')"
+
+      - name: Install NSIS (Windows)
+        run: npm install -g @tauri-apps/cli
 
       - name: Install deps
         run: npm install
 
       - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run tauri build
 
       - name: Upload artifacts
@@ -60,15 +62,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Sync version from tag
-        run: |
-          TAG="${{ github.ref_name }}"
-          VER="${TAG#v}"
-          sed -i '' "s/\"version\": \".*\"/\"version\": \"$VER\"/" src-tauri/tauri.conf.json
+        run: node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json','utf8'));j.version='${{ github.ref_name }}'.replace(/^v/,'');fs.writeFileSync('src-tauri/tauri.conf.json',JSON.stringify(j,null,2)+'\n')"
 
       - name: Install deps
         run: npm install
 
       - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run tauri build
 
       - name: Upload artifacts
