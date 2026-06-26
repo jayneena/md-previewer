@@ -11,17 +11,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .hero h1 { font-size: 3rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
 .hero p { font-size: 1.1rem; color: #94a3b8; max-width: 600px; margin: 0 auto 32px; }
 .hero-badge { display: inline-block; background: rgba(96,165,250,0.15); color: #60a5fa; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 16px; }
-.download-btn { display: inline-block; background: #3b82f6; color: #fff; padding: 12px 36px; border-radius: 8px; font-size: 1.05rem; font-weight: 600; text-decoration: none; transition: background 0.2s; border: none; cursor: pointer; }
-.download-btn:hover { background: #2563eb; }
-.download-panel { display: none; max-width: 420px; margin: 16px auto 0; background: #1e293b; border-radius: 10px; padding: 16px; border: 1px solid #334155; text-align: left; }
-.download-panel.show { display: block; }
-.dl-group { margin-bottom: 12px; }
-.dl-group:last-child { margin-bottom: 0; }
-.dl-group-title { font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px; }
-.dl-item { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 8px 14px; border-radius: 6px; margin-bottom: 4px; }
-.dl-item span { font-size: 0.85rem; }
-.dl-item a { background: #3b82f6; color: #fff; padding: 4px 14px; border-radius: 4px; font-size: 0.8rem; text-decoration: none; }
-.dl-item a:hover { background: #2563eb; }
+.dl-tiles { display: flex; justify-content: center; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
+.dl-tile { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 18px 28px; text-align: center; min-width: 140px; transition: border-color 0.2s; }
+.dl-tile:hover { border-color: #60a5fa; }
+.dl-tile-icon { font-size: 2rem; margin-bottom: 6px; }
+.dl-tile-name { font-size: 0.85rem; color: #94a3b8; margin-bottom: 10px; }
+.dl-tile-link { display: inline-block; background: #3b82f6; color: #fff; padding: 6px 20px; border-radius: 6px; font-size: 0.85rem; text-decoration: none; font-weight: 600; }
+.dl-tile-link:hover { background: #2563eb; }
+.dl-spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #334155; border-top-color: #60a5fa; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .github-link { display: inline-block; margin-left: 12px; color: #94a3b8; padding: 12px 24px; border-radius: 8px; font-size: 1rem; text-decoration: none; border: 1px solid #334155; transition: border-color 0.2s; }
 .github-link:hover { border-color: #60a5fa; color: #e2e8f0; }
 .section { max-width: 900px; margin: 0 auto; padding: 60px 20px; }
@@ -47,9 +45,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div class="hero-badge">📄 v1.0.0</div>
   <h1>MD Live Viewer</h1>
   <p>跨平台 Markdown 桌面编辑器 — 支持实时预览、代码编辑、Mermaid 图表、DOCX 模版导出。专为重度阅读、轻量编辑及规范文档输出的用户设计。</p>
-  <button class="download-btn" onclick="toggleDownloads()">⬇ 下载安装包</button>
+  <div class="dl-tiles" id="dlTiles">
+    <div class="dl-tile"><div class="dl-spinner"></div><span>加载中...</span></div>
+  </div>
   <a class="github-link" href="https://github.com/jayneena/md-previewer" target="_blank">查看源代码 →</a>
-  <div class="download-panel" id="downloadPanel"></div>
 </div>
 
 <div class="section">
@@ -88,29 +87,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <script>
-let dlLoaded = false;
-function toggleDownloads() {
-  const p = document.getElementById('downloadPanel');
-  if (p.classList.contains('show')) { p.classList.remove('show'); return; }
-  p.classList.add('show');
-  if (!dlLoaded) {
-    fetch('https://api.github.com/repos/jayneena/md-previewer/releases').then(r => r.json()).then(data => {
-      p.innerHTML = '';
-      data.forEach(r => {
-        if (!r.assets || !r.assets.length) return;
-        const div = document.createElement('div');
-        div.className = 'dl-group';
-        div.innerHTML = '<div class="dl-group-title">' + r.tag_name + '</div>';
-        r.assets.forEach(a => {
-          const icon = a.name.includes('dmg') ? '🍎' : a.name.includes('msi') || a.name.includes('exe') ? '🪟' : '📦';
-          div.innerHTML += '<div class="dl-item"><span>' + icon + ' ' + a.name + '</span><a href="' + a.browser_download_url + '">下载</a></div>';
-        });
-        p.appendChild(div);
-      });
-      dlLoaded = true;
-    }).catch(() => { p.innerHTML = '<div style="color:#94a3b8;text-align:center">加载失败</div>'; });
-  }
-}
+fetch('https://api.github.com/repos/jayneena/md-previewer/releases/latest').then(r => r.json()).then(r => {
+  if (!r.assets) return;
+  const tiles = [
+    { match: 'x64-setup', label: 'Windows', icon: '🪟', ext: '.exe' },
+    { match: 'x64_en-US.msi', label: 'Windows', icon: '🪟', ext: '.msi' },
+    { match: 'x64.dmg', label: 'macOS', icon: '🍎', ext: '.dmg' },
+  ];
+  const html = document.getElementById('dlTiles');
+  html.innerHTML = '';
+  tiles.forEach(t => {
+    const a = r.assets.find(a => a.name.includes(t.match));
+    if (!a) return;
+    html.innerHTML += '<div class="dl-tile"><div class="dl-tile-icon">' + t.icon + '</div><div class="dl-tile-name">' + t.label + '</div><a class="dl-tile-link" href="' + a.browser_download_url + '">下载 ' + t.ext + '</a></div>';
+  });
+}).catch(() => { document.getElementById('dlTiles').innerHTML = '<div style="color:#94a3b8">暂无可下载版本</div>'; });
 </script>
 </body>
 </html>
