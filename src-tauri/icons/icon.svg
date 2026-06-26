@@ -1,0 +1,13 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- 定义圆角矩形背景 -->
+  <rect x="64" y="64" width="384" height="384" rx="80" ry="80" fill="#2c2c2c" />
+  
+  <!-- 绘制 Markdown 符号: 左尖括号 -->
+  <path d="M192 200 L140 256 L192 312" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- 绘制 Markdown 符号: 右尖括号 -->
+  <path d="M320 200 L372 256 L320 312" stroke="white" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- 绘制 Markdown 符号: 列表短横线 (可选装饰) -->
+  <line x1="180" y1="380" x2="332" y2="380" stroke="white" stroke-width="30" stroke-linecap="round" opacity="0.8"/>
+</svg>
