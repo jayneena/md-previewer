@@ -32,7 +32,9 @@ jobs:
         shell: pwsh
         run: |
           $tag = "${{ github.ref_name }}"
-          gh release create $tag --title $tag --notes "自动构建" src-tauri/target/release/bundle/nsis/*.exe src-tauri/target/release/bundle/msi/*.msi
+          $files = @(Get-ChildItem "src-tauri/target/release/bundle/nsis/*.exe") + @(Get-ChildItem "src-tauri/target/release/bundle/msi/*.msi")
+          gh release create $tag --title $tag --notes "自动构建" 2>$null
+          gh release upload $tag $files.FullName --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,6 +59,8 @@ jobs:
         run: npm run tauri build
 
       - name: Upload to release
-        run: gh release create ${{ github.ref_name }} --title ${{ github.ref_name }} --notes "自动构建" src-tauri/target/release/bundle/dmg/*.dmg
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} --title ${{ github.ref_name }} --notes "自动构建" 2>/dev/null || true
+          gh release upload ${{ github.ref_name }} src-tauri/target/release/bundle/dmg/*.dmg --clobber
